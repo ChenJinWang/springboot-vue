@@ -28,12 +28,22 @@ public class SysInterceptor implements HandlerInterceptor {
             }else{
                 // 如果token不为空
                 Claims claims = JwtUtils.validateJWT(token).getClaims();
-                if(claims==null){
-                    System.out.println("鉴权失败");
-                    throw new RuntimeException("鉴权失败！");
+                // 管理员 /admin开头路径请求
+                if(path.startsWith("/admin")){
+                    if(claims==null || !claims.getSubject().equals("admin") || !claims.getId().equals("-1")){
+                        throw new RuntimeException("管理员 鉴权失败 ");
+                    }else{
+                        System.out.println("鉴权成功");
+                        return true;
+                    }
                 }else{
-                    System.out.println("鉴权成功");
-                    return true;
+                    if(claims==null){
+                        System.out.println("鉴权失败");
+                        throw new RuntimeException("鉴权失败！");
+                    }else{
+                        System.out.println("鉴权成功");
+                        return true;
+                    }
                 }
             }
         }else{
